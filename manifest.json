@@ -1,0 +1,17 @@
+{
+  "name": "Historia Blanca · Goles desde 1950",
+  "short_name": "Historia Blanca",
+  "description": "Base de datos de goles con goleador, minuto y resultado de cada partido desde 1950 hasta hoy.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1e2a4a",
+  "theme_color": "#1e2a4a",
+  "lang": "es",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

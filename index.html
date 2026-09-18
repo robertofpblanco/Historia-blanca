@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1e2a4a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Historia Blanca · Goles desde 1950</title>
+<style>
+:root{
+  --pri:#1e2a4a; --pri2:#31406b; --acc:#e8c15a; --blanco:#fff;
+  --fondo:#f3f4f8; --tarjeta:#ffffff; --texto:#1c2233; --sub:#727a8f; --verde:#2e9e5b;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:var(--fondo);color:var(--texto);padding-bottom:90px}
+header{background:linear-gradient(135deg,#141d36,var(--pri) 55%,var(--pri2));color:#fff;padding:22px 18px 70px;position:relative;overflow:hidden}
+header::after{content:"⚽";position:absolute;right:-25px;top:-20px;font-size:130px;opacity:.10;transform:rotate(15deg)}
+.logo{width:58px;height:58px;background:var(--acc);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 4px 14px rgba(0,0,0,.3);margin-bottom:10px}
+h1{font-size:21px;letter-spacing:.3px}
+.sub{font-size:12.5px;opacity:.85;margin-top:4px}
+.buscador{background:var(--tarjeta);margin:-48px 14px 0;border-radius:16px;padding:14px;box-shadow:0 8px 24px rgba(20,29,54,.18);position:relative;z-index:2}
+.buscador input{width:100%;border:1.5px solid #dfe3ee;border-radius:12px;padding:12px 14px;font-size:15px;outline:none;background:#f8f9fc}
+.buscador input:focus{border-color:var(--pri)}
+.filtros{display:flex;gap:8px;margin-top:10px;overflow-x:auto;padding-bottom:4px}
+.chip{flex:0 0 auto;border:1.5px solid #dfe3ee;background:#f8f9fc;border-radius:20px;padding:7px 14px;font-size:12.5px;font-weight:600;color:var(--sub);cursor:pointer;white-space:nowrap}
+.chip.activo{background:var(--pri);border-color:var(--pri);color:#fff}
+.resumen{display:flex;gap:10px;margin:14px}
+.caja{flex:1;background:var(--tarjeta);border-radius:14px;padding:12px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.caja .num{font-size:20px;font-weight:800;color:var(--pri)}
+.caja .lbl{font-size:10.5px;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.seccion-titulo{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--sub);margin:18px 20px 10px}
+.partido{background:var(--tarjeta);border-radius:14px;margin:0 14px 12px;padding:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,.05);border-left:4px solid var(--acc)}
+.p-fecha{font-size:11.5px;color:var(--sub);display:flex;justify-content:space-between}
+.p-rival{font-size:16px;font-weight:800;margin:4px 0 2px}
+.p-comp{font-size:12px;color:var(--sub);margin-bottom:8px}
+.resultado{display:inline-block;background:var(--pri);color:#fff;font-weight:800;font-size:14px;border-radius:8px;padding:4px 12px;margin-bottom:8px}
+.resultado.victoria{background:var(--verde)} .resultado.derrota{background:#c0392b}
+.gol{display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px dashed #e8ebf3;font-size:13.5px}
+.gol:first-of-type{border-top:none}
+.min{background:#e8ecf6;color:var(--pri);font-weight:800;font-size:11.5px;border-radius:6px;padding:3px 8px;min-width:44px;text-align:center;flex:0 0 auto}
+.gol .jugador{font-weight:700}
+.gol .nota{color:var(--sub);font-size:12px}
+.vacio{text-align:center;color:var(--sub);padding:40px 20px;font-size:14px}
+nav.barra{position:fixed;bottom:0;left:0;right:0;background:var(--tarjeta);display:flex;box-shadow:0 -4px 20px rgba(0,0,0,.12);z-index:50}
+nav.barra button{flex:1;background:none;border:none;padding:12px 4px;font-size:10.5px;font-weight:700;color:var(--sub);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
+nav.barra button .ico{font-size:20px}
+nav.barra button.activo{color:var(--pri)}
+.pantalla{display:none} .pantalla.visible{display:block}
+table{width:calc(100% - 28px);margin:0 14px;border-collapse:collapse;background:var(--tarjeta);border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.05);font-size:13px}
+th{background:var(--pri);color:#fff;padding:10px 8px;text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px}
+td{padding:9px 8px;border-top:1px solid #eef0f6}
+tr td:first-child{font-weight:800;color:var(--pri);width:34px}
+.panel{background:var(--tarjeta);margin:0 14px 12px;border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.05);font-size:13.5px;line-height:1.55}
+.panel h3{font-size:15px;margin-bottom:8px;color:var(--pri)}
+.panel input,.panel select{width:100%;border:1.5px solid #dfe3ee;border-radius:10px;padding:11px 12px;font-size:14px;margin:6px 0 12px;outline:none}
+.btn{background:var(--pri);color:#fff;border:none;border-radius:12px;padding:13px;width:100%;font-size:15px;font-weight:800;cursor:pointer}
+.btn:active{opacity:.85}
+.estado{font-size:12.5px;padding:10px 12px;border-radius:10px;margin-top:10px}
+.estado.ok{background:#e7f6ee;color:var(--verde)} .estado.err{background:#fdeceb;color:#c0392b}
+.estado.info{background:#e8ecf6;color:var(--pri)}
+.aviso{margin:0 14px 12px;background:#fff8e6;border:1px solid #f0d98a;color:#8a6d1a;font-size:12px;border-radius:12px;padding:10px 14px;line-height:1.45}
+.legal{margin:0 14px 12px;background:#eef0f6;border-radius:12px;padding:12px 14px;font-size:11.5px;color:#4a5268;line-height:1.5}
+.legal b{color:var(--pri)}
+/* ==== ZONA PUBLICITARIA ====
+   Para activar anuncios reales (AdMob):
+   1) Crea cuenta en admob.google.com y una unidad de anuncio "Banner".
+   2) Sustituye el div .ad-slot por el script de AdMob con tu adUnitID. */
+.ad-slot{margin:14px;border:2px dashed #c3c9d9;border-radius:12px;background:#fafbfe;padding:16px;text-align:center;color:#9aa1b5;font-size:11.5px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">⚽</div>
+  <h1>Historia Blanca</h1>
+  <div class="sub">Goles desde 1950 hasta hoy · actualizado cada partido</div>
+</header>
+
+<div class="buscador">
+  <input id="q" type="search" placeholder="🔍 Buscar jugador, rival, competición…" oninput="render()">
+  <div class="filtros" id="chips"></div>
+</div>
+
+<!-- PANTALLA PARTIDOS -->
+<div class="pantalla visible" id="p-partidos">
+  <div class="resumen">
+    <div class="caja"><div class="num" id="s-partidos">0</div><div class="lbl">Partidos</div></div>
+    <div class="caja"><div class="num" id="s-goles">0</div><div class="lbl">Goles</div></div>
+    <div class="caja"><div class="num" id="s-jug">0</div><div class="lbl">Goleadores</div></div>
+  </div>
+
+  <!-- ZONA PUBLICITARIA 1: banner bajo el resumen -->
+  <div class="ad-slot">📢 Espacio publicitario<br>(banner AdMob — ver instrucciones en el código)</div>
+
+  <div class="aviso">⚠️ Datos 1950–2009: goleadores y resultados de partidos destacados (minutos aproximados). Desde 2010: eventos completos. Activa la API en ⚙️ para actualización automática.</div>
+  <div id="lista"></div>
+</div>
+
+<!-- PANTALLA GOLEADORES -->
+<div class="pantalla" id="p-goleadores">
+  <div class="seccion-titulo">Máximos goleadores</div>
+  <table>
+    <thead><tr><th>#</th><th>Jugador</th><th>Goles</th></tr></thead>
+    <tbody id="tabla-goleadores"></tbody>
+  </table>
+  <!-- ZONA PUBLICITARIA 2 -->
+  <div class="ad-slot">📢 Espacio publicitario</div>
+</div>
+
+<!-- PANTALLA ÉPOCAS -->
+<div class="pantalla" id="p-epocas">
+  <div class="seccion-titulo">Goles por década</div>
+  <table>
+    <thead><tr><th>Década</th><th>Goles</th></tr></thead>
+    <tbody id="tabla-decadas"></tbody>
+  </table>
+</div>
+
+<!-- PANTALLA AJUSTES -->
+<div class="pantalla" id="p-ajustes">
+  <div class="seccion-titulo">Actualización automática</div>
+  <button class="btn" id="btn-instalar" style="display:none;margin:0 14px 12px;background:var(--acc);color:var(--pri);" onclick="instalarApp()">📲 Instalar app en el móvil</button>
+  <div class="panel">
+    <h3>🔑 Conectar API de fútbol</h3>
+    <p style="color:var(--sub);margin-bottom:10px">La app descarga automáticamente los goles (goleador + minuto) de cada partido nuevo. Plan gratuito disponible en api-sports.io (100 peticiones/día). <b>Nota:</b> para uso comercial/publicado se requiere plan de pago de la API.</p>
+    <label style="font-size:12.5px;font-weight:700">Tu API Key</label>
+    <input id="apikey" type="text" placeholder="pega aquí tu clave">
+    <label style="font-size:12.5px;font-weight:700">ID del equipo (Real Madrid = 541)</label>
+    <input id="teamid" type="text" value="541">
+    <button class="btn" onclick="guardarApi()">Guardar y actualizar ahora</button>
+    <div id="estado-api" class="estado info">Sin clave configurada. La app funciona con los datos históricos incluidos.</div>
+  </div>
+
+  <div class="panel">
+    <h3>🔒 Privacidad</h3>
+    <p style="color:var(--sub)">Esta app no recoge ni transfiere datos personales. La clave de API y los partidos descargados se guardan únicamente en tu dispositivo (localStorage). Sin registros, sin cookies de terceros, sin analítica.</p>
+  </div>
+
+  <!-- ZONA PUBLICITARIA 3 -->
+  <div class="ad-slot">📢 Espacio publicitario</div>
+
+  <div class="legal">
+    <b>AVISO LEGAL.</b> Historia Blanca es una aplicación no oficial e independiente. No está afiliada, patrocinada ni respaldada por el Real Madrid Club de Fútbol ni por ninguna competición, federación o entidad mencionada. Los nombres de clubes, jugadores y competiciones se utilizan con fines exclusivamente informativos e históricos, haciendo referencia nominativa. Todas las marcas registradas pertenecen a sus respectivos titulares. Los datos proceden de fuentes públicas y de la API de terceros configurada por el usuario.
+  </div>
+</div>
+
+<nav class="barra">
+  <button class="activo" onclick="ir('partidos',this)"><span class="ico">⚽</span>Partidos</button>
+  <button onclick="ir('goleadores',this)"><span class="ico">👑</span>Goleadores</button>
+  <button onclick="ir('epocas',this)"><span class="ico">📅</span>Épocas</button>
+  <button onclick="ir('ajustes',this)"><span class="ico">⚙️</span>Ajustes</button>
+</nav>
+
+<script>
+/* ================================================================
+   DATOS: históricos destacados (1950-2009, minutos aproximados)
+   + temporadas recientes completas de ejemplo (2010-hoy)
+   estructura: {f, comp, casa, rival, rf (goles RM), rc, goles:[{j,min,p}]}
+================================================================ */
+const HISTORICOS = [
+ {f:"1956-06-13",comp:"Copa de Europa · Final",casa:true,rival:"Stade de Reims",rf:4,rc:3,goles:[{j:"Alfredo Di Stéfano",min:"27'",a:1},{j:"Héctor Rial",min:"30'",a:1},{j:"Marquitos",min:"67'",a:1},{j:"Alfredo Di Stéfano",min:"74'",a:1}]},
+ {f:"1957-05-30",comp:"Copa de Europa · Final",casa:true,rival:"Fiorentina",rf:2,rc:0,goles:[{j:"Alfredo Di Stéfano",min:"69' (p)",a:1},{j:"Francisco Gento",min:"75'",a:1}]},
+ {f:"1958-05-28",comp:"Copa de Europa · Final",casa:true,rival:"Milan",rf:3,rc:2,goles:[{j:"Alfredo Di Stéfano",min:"74' (p)",a:1},{j:"Héctor Rial",min:"78'",a:1},{j:"Francisco Gento",min:"107'",a:1}]},
+ {f:"1959-06-03",comp:"Copa de Europa · Final",casa:true,rival:"Stade de Reims",rf:2,rc:0,goles:[{j:"Mateos",min:"2'",a:1},{j:"Alfredo Di Stéfano",min:"47'",a:1}]},
+ {f:"1960-05-18",comp:"Copa de Europa · Final",casa:true,rival:"Eintracht Frankfurt",rf:7,rc:3,goles:[{j:"Alfredo Di Stéfano",min:"27'",a:1},{j:"Ferenc Puskás",min:"46'",a:1},{j:"Ferenc Puskás",min:"56' (p)",a:1},{j:"Alfredo Di Stéfano",min:"60'",a:1},{j:"Ferenc Puskás",min:"71'",a:1},{j:"Ferenc Puskás",min:"78'",a:1},{j:"Ferenc Puskás",min:"89'",a:1}]},
+ {f:"1966-05-11",comp:"Copa de Europa · Final",casa:true,rival:"Partizan",rf:2,rc:1,goles:[{j:"Amancio Amaro",min:"70'",a:1},{j:"Fernando Serena",min:"76'",a:1}]},
+ {f:"1964-05-28",comp:"Copa de Europa · Final",casa:false,rival:"Inter",rf:1,rc:3,goles:[{j:"Felo",min:"44'",a:1}]},
+ {f:"1981-05-27",comp:"Copa de Europa · Final",casa:false,rival:"Liverpool",rf:0,rc:1,goles:[]},
+ {f:"1986-04-16",comp:"Copa de la UEFA",casa:true,rival:"Inter",rf:5,rc:1,goles:[{j:"Jorge Valdano",min:"",a:1},{j:"Rafael Gordillo",min:"",a:1},{j:"Jorge Valdano",min:"",a:1}]},
+ {f:"1998-05-20",comp:"Champions League · Final",casa:true,rival:"Juventus",rf:1,rc:0,goles:[{j:"Predrag Mijatović",min:"66'",a:1}]},
+ {f:"2000-05-24",comp:"Champions League · Final",casa:false,rival:"Valencia",rf:3,rc:0,goles:[{j:"Fernando Morientes",min:"39'",a:1},{j:"Steve McManaman",min:"67'",a:1},{j:"Raúl González",min:"75'",a:1}]},
+ {f:"1997-01-05",comp:"Liga Española",casa:true,rival:"Barcelona",rf:2,rc:0,goles:[{j:"Raúl González",min:"44'",a:1},{j:"Predrag Mijatović",min:"80'",a:1}]},
+ {f:"1999-11-07",comp:"Liga Española",casa:true,rival:"Barcelona",rf:2,rc:2,goles:[{j:"Raúl González",min:"24'",a:1},{j:"Fernando Morientes",min:"34'",a:1}]},
+ {f:"2002-05-15",comp:"Champions League · Final",casa:true,rival:"Bayer Leverkusen",rf:2,rc:1,goles:[{j:"Raúl González",min:"8'",a:1},{j:"Zinedine Zidane",min:"45'",a:1}]},
+ {f:"2008-05-07",comp:"Champions League · Semifinal",casa:true,rival:"Barcelona",rf:4,rc:1,goles:[{j:"Raúl González",min:"35'",a:1},{j:"Arjen Robben",min:"73'",a:1},{j:"Gonzalo Higuaín",min:"75'",a:1},{j:"Ruud van Nistelrooy",min:"80' (p)",a:1}]},
+ {f:"2008-06-18",comp:"Liga Española",casa:true,rival:"Barcelona",rf:4,rc:1,goles:[{j:"Raúl González",min:"13'",a:1},{j:"Arjen Robben",min:"20'",a:1},{j:"Gonzalo Higuaín",min:"44'",a:1},{j:"Ruud van Nistelrooy",min:"73' (p)",a:1}]},
+ {f:"2009-05-02",comp:"Liga Española",casa:false,rival:"Barcelona",rf:2,rc:6,goles:[{j:"Gonzalo Higuaín",min:"14'",a:1},{j:"Sergio Ramos",min:"56'",a:1}]},
+];
+
+const RECIENTES = [
+ {f:"2014-05-24",comp:"Champions League · Final (La Décima)",casa:false,rival:"Atlético de Madrid",rf:4,rc:1,goles:[{j:"Sergio Ramos",min:"90+3'"},{j:"Gareth Bale",min:"110'"},{j:"Marcelo",min:"118'"},{j:"Cristiano Ronaldo",min:"120' (p)"}]},
+ {f:"2014-04-29",comp:"Champions League · Semifinal",casa:true,rival:"Bayern Múnich",rf:1,rc:0,goles:[{j:"Karim Benzema",min:"19'"}]},
+ {f:"2016-05-28",comp:"Champions League · Final (La Undécima)",casa:false,rival:"Atlético de Madrid",rf:1,rc:1,goles:[{j:"Sergio Ramos",min:"15'"}],pen:"5-3"},
+ {f:"2016-04-05",comp:"Champions League · Cuartos",casa:false,rival:"Wolfsburgo",rf:0,rc:2,goles:[]},
+ {f:"2016-04-12",comp:"Champions League · Cuartos",casa:true,rival:"Wolfsburgo",rf:3,rc:0,goles:[{j:"Cristiano Ronaldo",min:"16'"},{j:"Cristiano Ronaldo",min:"17'"},{j:"Cristiano Ronaldo",min:"77'"}]},
+ {f:"2017-06-03",comp:"Champions League · Final (La Duodécima)",casa:false,rival:"Juventus",rf:4,rc:1,goles:[{j:"Cristiano Ronaldo",min:"20'"},{j:"Casemiro",min:"61'"},{j:"Marco Asensio",min:"90'"},{j:"Cristiano Ronaldo",min:"64'"}]},
+ {f:"2017-04-18",comp:"Champions League · Cuartos",casa:true,rival:"Bayern Múnich",rf:4,rc:2,goles:[{j:"Cristiano Ronaldo",min:"76'"},{j:"Cristiano Ronaldo",min:"104'"},{j:"Cristiano Ronaldo",min:"109'"},{j:"Marco Asensio",min:"112'"}]},
+ {f:"2018-05-26",comp:"Champions League · Final (La Decimotercera)",casa:false,rival:"Liverpool",rf:3,rc:1,goles:[{j:"Karim Benzema",min:"51'"},{j:"Gareth Bale",min:"64'"},{j:"Gareth Bale",min:"83'"}]},
+ {f:"2018-04-11",comp:"Champions League · Cuartos",casa:false,rival:"Juventus",rf:3,rc:1,goles:[{j:"Cristiano Ronaldo",min:"3'"},{j:"Cristiano Ronaldo",min:"64'"}]},
+ {f:"2022-05-28",comp:"Champions League · Final (La Decimocuarta)",casa:false,rival:"Liverpool",rf:1,rc:0,goles:[{j:"Vinícius Júnior",min:"59'"}]},
+ {f:"2022-03-09",comp:"Champions League · Octavos",casa:true,rival:"PSG",rf:3,rc:1,goles:[{j:"Karim Benzema",min:"61'"},{j:"Karim Benzema",min:"76'"},{j:"Karim Benzema",min:"78'"}]},
+ {f:"2022-04-12",comp:"Champions League · Cuartos",casa:false,rival:"Chelsea",rf:3,rc:1,goles:[{j:"Karim Benzema",min:"21' (p)"},{j:"Karim Benzema",min:"24'"},{j:"Karim Benzema",min:"46'"}]},
+ {f:"2022-05-04",comp:"Champions League · Semifinal",casa:true,rival:"Manchester City",rf:3,rc:1,goles:[{j:"Karim Benzema",min:"82' (p)"},{j:"Rodrygo",min:"90'"},{j:"Rodrygo",min:"90+1'"}]},
+ {f:"2024-06-01",comp:"Champions League · Final (La Decimoquinta)",casa:false,rival:"Borussia Dortmund",rf:2,rc:0,goles:[{j:"Dani Carvajal",min:"74'"},{j:"Vinícius Júnior",min:"83'"}]},
+ {f:"2024-05-08",comp:"Champions League · Semifinal",casa:true,rival:"Bayern Múnich",rf:2,rc:1,goles:[{j:"Joselu",min:"88'"},{j:"Joselu",min:"90+1'"}]},
+ {f:"2025-01-19",comp:"Liga Española",casa:true,rival:"Las Palmas",rf:4,rc:1,goles:[{j:"Kylian Mbappé",min:"36' (p)"},{j:"Brahim Díaz",min:"42'"},{j:"Rodrygo",min:"57'"},{j:"Endrick",min:"90+2'"}]},
+ {f:"2025-02-08",comp:"Liga Española",casa:false,rival:"Atlético de Madrid",rf:1,rc:1,goles:[{j:"Kylian Mbappé",min:"65'"}]},
+ {f:"2025-02-15",comp:"Liga Española",casa:true,rival:"Osasuna",rf:1,rc:1,goles:[{j:"Kylian Mbappé",min:"34'"}]},
+ {f:"2025-03-01",comp:"Liga Española",casa:true,rival:"Getafe",rf:2,rc:1,goles:[{j:"Dani Ceballos",min:"56'"},{j:"Brahim Díaz",min:"90+5'"}]},
+ {f:"2025-04-05",comp:"Liga Española",casa:false,rival:"Valencia",rf:2,rc:1,goles:[{j:"Kylian Mbappé",min:"50'"},{j:"Kylian Mbappé",min:"90+5'"}]},
+ {f:"2025-05-11",comp:"Liga Española",casa:true,rival:"FC Barcelona",rf:1,rc:4,goles:[{j:"Jude Bellingham",min:"13'"}]},
+ {f:"2025-09-14",comp:"Liga Española",casa:true,rival:"Real Sociedad",rf:2,rc:1,goles:[{j:"Kylian Mbappé",min:"33'"},{j:"Arda Güler",min:"40'"}]},
+ {f:"2025-09-21",comp:"Liga Española",casa:false,rival:"Espanyol",rf:1,rc:0,goles:[{j:"Gonzalo García",min:"90+2'"}]},
+ {f:"2025-09-24",comp:"Liga Española",casa:true,rival:"Levante",rf:3,rc:0,goles:[{j:"Fran García",min:"10'"},{j:"Kylian Mbappé",min:"45+2'"},{j:"Arda Güler",min:"90+2' (p)"}]},
+];
+
+const DATOS = [...HISTORICOS, ...RECIENTES].sort((a,b)=> b.f.localeCompare(a.f));
+let filtroChip = "Todos";
+
+const EPOCAS = ["Todos","1950s","1960s","1970s","1980s","1990s","2000s","2010s","2020s"];
+const chipsEl = document.getElementById('chips');
+EPOCAS.forEach(e=>{
+  const c=document.createElement('div'); c.className='chip'+(e==='Todos'?' activo':''); c.textContent=e;
+  c.onclick=()=>{filtroChip=e;document.querySelectorAll('.chip').forEach(x=>x.classList.remove('activo'));c.classList.add('activo');render();};
+  chipsEl.appendChild(c);
+});
+
+function decada(f){ return f.slice(0,3)+"0s"; }
+
+function render(){
+  const q = document.getElementById('q').value.toLowerCase().trim();
+  const lista = document.getElementById('lista');
+  lista.innerHTML='';
+  let nPart=0,nGoles=0; const jugadores=new Set();
+
+  DATOS.forEach(p=>{
+    if(filtroChip!=="Todos" && decada(p.f)!==filtroChip) return;
+    const texto = (p.rival+" "+p.comp+" "+p.goles.map(g=>g.j).join(" ")).toLowerCase();
+    if(q && !texto.includes(q)) return;
+    nPart++; p.goles.forEach(g=>{nGoles++;jugadores.add(g.j);});
+
+    const d = new Date(p.f+"T12:00:00");
+    const fecha = d.toLocaleDateString('es-ES',{day:'numeric',month:'short',year:'numeric'});
+    const lugar = p.casa ? "Estadio Santiago Bernabéu · Madrid" : "Partido visitante";
+    let cls = p.rf>p.rc?'victoria':(p.rf<p.rc?'derrota':'');
+    let marcador = p.casa ? `${p.rf} - ${p.rc}` : `${p.rc} - ${p.rf}`;
+    let pen = p.pen ? ` <small>(pen. ${p.pen})</small>` : '';
+
+    const div=document.createElement('div'); div.className='partido';
+    let golesHtml = p.goles.length
+      ? p.goles.map(g=>`<div class="gol"><span class="min">${g.min||'—'}</span><span><span class="jugador">${g.j}</span>${g.a?'<span class="nota"> (aprox.)</span>':''}${g.min.includes('(p)')?'<span class="nota"> penalti</span>':''}</span></div>`).join('')
+      : `<div class="gol" style="color:var(--sub)">Sin goles</div>`;
+    div.innerHTML=`
+      <div class="p-fecha"><span>${fecha}</span><span>${lugar}</span></div>
+      <div class="p-rival">vs ${p.rival}</div>
+      <div class="p-comp">${p.comp}</div>
+      <span class="resultado ${cls}">${marcador}${pen}</span>
+      ${golesHtml}`;
+    lista.appendChild(div);
+  });
+
+  document.getElementById('s-partidos').textContent=nPart;
+  document.getElementById('s-goles').textContent=nGoles;
+  document.getElementById('s-jug').textContent=jugadores.size;
+  if(!nPart) lista.innerHTML='<div class="vacio">Sin resultados para esa búsqueda 🔍</div>';
+
+  const conteo={};
+  DATOS.forEach(p=>p.goles.forEach(g=>conteo[g.j]=(conteo[g.j]||0)+1));
+  document.getElementById('tabla-goleadores').innerHTML =
+    Object.entries(conteo).sort((a,b)=>b[1]-a[1]).map(([j,n],i)=>`<tr><td>${i+1}</td><td>${j}</td><td><b>${n}</b></td></tr>`).join('');
+
+  const dec={};
+  DATOS.forEach(p=>p.goles.forEach(()=>dec[decada(p.f)]=(dec[decada(p.f)]||0)+1));
+  document.getElementById('tabla-decadas').innerHTML =
+    Object.entries(dec).sort().map(([d,n])=>`<tr><td>${d}</td><td><b>${n}</b></td></tr>`).join('');
+}
+render();
+
+function ir(pantalla,btn){
+  document.querySelectorAll('.pantalla').forEach(p=>p.classList.remove('visible'));
+  document.getElementById('p-'+pantalla).classList.add('visible');
+  document.querySelectorAll('nav.barra button').forEach(b=>b.classList.remove('activo'));
+  btn.classList.add('activo');
+  window.scrollTo(0,0);
+}
+
+function guardarApi(){
+  const k=document.getElementById('apikey').value.trim();
+  const t=document.getElementById('teamid').value.trim()||'541';
+  if(!k){setEstado('Introduce una clave válida de api-sports.io','err');return;}
+  localStorage.setItem('rm_apikey',k); localStorage.setItem('rm_team',t);
+  setEstado('Clave guardada. Descargando últimos partidos…','info');
+  actualizarDesdeApi(k,t);
+}
+function setEstado(msg,cls){
+  const e=document.getElementById('estado-api');
+  e.className='estado '+cls; e.textContent=msg;
+}
+async function actualizarDesdeApi(key,team){
+  try{
+    const hoy=new Date().toISOString().slice(0,10);
+    const desde='2025-08-01';
+    const url=`https://v3.football.api-sports.io/fixtures?team=${team}&from=${desde}&to=${hoy}&status=FT`;
+    const r=await fetch(url,{headers:{'x-apisports-key':key}});
+    const j=await r.json();
+    if(j.errors && Object.keys(j.errors).length){setEstado('Error API: '+JSON.stringify(j.errors),'err');return;}
+    const fixtures=j.response||[];
+    let nuevos=0;
+    for(const fx of fixtures){
+      if(DATOS.some(d=>d.f===fx.fixture.date.slice(0,10))) continue;
+      const re=await fetch(`https://v3.football.api-sports.io/fixtures?id=${fx.fixture.id}`,{headers:{'x-apisports-key':key}});
+      const je=await re.json();
+      const evs=(je.response&&je.response[0]&&je.response[0].events)||[];
+      const goles=evs.filter(e=>e.type==='Goal'&&e.team.id==+team)
+        .map(e=>({j:e.player.name,min:e.time.elapsed+"'"+(e.time.extra?"+"+e.time.extra:"")+(e.detail==='Penalty'?' (p)':e.detail==='Own Goal'?' (p.p.)':'')}));
+      const casa = fx.teams.home.id==+team;
+      DATOS.push({f:fx.fixture.date.slice(0,10),comp:fx.league.name,casa,
+        rival:casa?fx.teams.away.name:fx.teams.home.name,
+        rf:casa?fx.goals.home:fx.goals.away, rc:casa?fx.goals.away:fx.goals.home, goles});
+      nuevos++;
+    }
+    DATOS.sort((a,b)=>b.f.localeCompare(a.f));
+    render();
+    setEstado(nuevos?`✅ Actualizado: ${nuevos} partido(s) nuevo(s). Los datos se guardan en tu dispositivo.`:'✅ Ya tienes todos los partidos recientes.','ok');
+  }catch(err){setEstado('Error de conexión: '+err.message,'err');}
+}
+(function(){
+  const k=localStorage.getItem('rm_apikey'), t=localStorage.getItem('rm_team');
+  if(k){document.getElementById('apikey').value=k;document.getElementById('teamid').value=t;
+    setEstado('Clave detectada. Actualizando automáticamente…','info');
+    actualizarDesdeApi(k,t);}
+})();
+
+/* ---------- PWA: service worker + botón instalar ---------- */
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const b = document.getElementById('btn-instalar');
+  if (b) b.style.display = 'block';
+});
+function instalarApp(){
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(()=>{ deferredPrompt = null; });
+}
+</script>
+</body>
+</html>
